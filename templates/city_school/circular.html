@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Profile</title>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Font Awesome CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<style>
+  .navbar-brand {
+    font-size: 22px;
+    font-weight: bold;
+  }
+
+  .navbar-brand i.fa {
+    border: 1px solid white; /* Set border color to white */
+    padding: 5px; /* Add padding to increase space around the icon */
+    border-radius: 50%; /* Add border radius to make the border rounded */
+    color: white; /* Set text color to white */
+  }
+  .navbar {
+    padding: 4px 0; /* Adjust the top and bottom padding as needed */
+    padding-left:10px;
+}
+
+  .nav_text {
+    color: white; /* Set text color to white */
+    margin-left: 10px; /* Add left margin of 10px */
+    font-size: 22px;
+  }
+
+  .user-list {
+    list-style-type: none;
+    padding: 0px;
+    padding-top: 50px;
+    
+  }
+
+  .user-item {
+    margin-bottom: 0px;
+    padding-left: 4px; /* Add padding to the left */
+    padding-right: 4px; /* Add padding to the right */
+    border-radius: 8px; /* Add border radius */
+    border-bottom: 1px solid rgba(204, 204, 204, 0.9); /* Add bottom border with faint color */
+}
+
+
+  .user-info {
+    display: flex; /* Use flexbox */
+    align-items: center; /* Center items vertically */
+  }
+
+  .book-icon {
+    color: orange; /* Change icon color to orange */
+    font-size: 34px; /* Increase icon size */
+    margin-right: 10px;
+  }
+
+  .user-date {
+    color: rgba(0, 0, 0, 0.7); /* Faint black color */
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 18px; /* Increase font size */
+    display: flex; /* Use flexbox */
+    align-items: center; /* Center items vertically */
+    padding-top:15px;
+  }
+
+  .pdf-icon {
+    color: rgba(0, 0, 0, 0.7); /* Faint black color */
+    font-size: 34px; /* Increase icon size */
+    margin-left: auto; /* Align the PDF icon to the right */
+    margin-bottom: 0px; /* Add bottom margin */
+  }
+
+  .description {
+    color: rgba(0, 0, 0, 0.7); /* Faint black color */
+    margin-top: 0px; /* Add margin on top */
+    margin-left: 0px; /* Add margin on left */
+    font-size: 14px; /* Increase font size */
+    font-weight: bold;
+    padding:0;
+    margin-bottom: 25px;
+
+  }
+
+</style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: rgb(57,159,34);">
+      <a class="navbar-brand" href="{% url 'dashboard' %}">
+          <i class="fa fa-arrow-left" aria-hidden="true"></i>
+          <span class="nav_text" style="font-weight: bold;">{{ circulars.0.type|title|upper }}</span> <!-- Convert to uppercase -->
+      </a>
+  </nav>
+
+<div class="container">
+  <ul class="user-list">
+      <!-- Loop over circulars -->
+      {% for circular in circulars %}
+      <li class="user-item">
+          <div class="user-info">
+              <div class="book-icon">
+                  <i class="fas fa-bullhorn" style="color: white; background-color: rgb(237, 112, 20); width: 40px; height: 40px; display: inline-block; text-align: center; line-height: 30px; font-size: 24px; padding: 5px;"></i><!-- Open book icon -->
+              </div>
+              <div class="user-date">{{ circular.date }}</div>
+
+              <a href="{% url 'pdf' %}?pdf_link={{ circular.pdf_link }}&description={{ circular.description }}&type={{ circular.type }}" class="pdf-icon">
+                <i class="far fa-file-pdf"></i> 
+                <!-- PDF icon -->
+            </a>
+
+          </div>
+          <div class="description">
+              {{ circular.description }}
+          </div>
+      </li>
+      {% endfor %}
+      <!-- End loop -->
+  </ul>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
+</html>

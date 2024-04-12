@@ -1,0 +1,116 @@
+{% load i18n %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    /* Custom Styles */
+    .login-container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 200px;
+    }
+    .logo {
+      height: 230px; /* Adjust the height as needed */
+    }
+    .custom-btn {
+      width: 40%;
+      margin: auto;
+      margin-top: 25px; /* Add top margin */
+    }
+    
+    .form-control {
+      height: 50px; /* Adjust the height as needed */
+      border-radius: 10px; /* Border radius */
+      border: 2px solid #ced4da; /* Border */
+      box-shadow: 0 0 5px rgba(0,0,0,0.1); /* Box shadow */
+    }
+    .input-group-prepend {
+      height: 50px;
+    }
+    .input-group-prepend .input-group-text {
+      background-color: #f8f9fa;
+      border: 2px solid #ced4da; /* Border for the icon */
+      border-right: none; /* Remove right border */
+      border-radius: 10px 0 0 10px; /* Adjust border radius */
+    }
+    .input-group-prepend .input-group-text i {
+      padding: 12px; /* Adjust padding to center the icon */
+    }
+
+    .icon-container {
+      width: 50px; /* Set a fixed width */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f8f9fa;
+      border: 2px solid #ced4da;
+      border-right: none;
+      border-radius: 10px 0 0 10px;
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="login-container">
+        <div class="text-center mb-4">
+          <img src="{% static 'assets/img/city_school_logo.jpg' %}"  alt="Your Logo" class="logo">
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-container"><i class="fas fa-mobile-alt fa-lg"></i></span>
+                </div>
+              </div>
+              <input type="text" class="form-control" name="otp" id="otpInput" placeholder="OTP (6 Digit)">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success btn-block custom-btn" id="proceedBtn">
+            Proceed
+          </button>
+          <p class="text-muted mt-3">Wait for 2 minutes to receive OTP.</p>
+        </form>
+        
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Font Awesome -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
+  <!-- Custom JavaScript -->
+  {% comment %} <script>
+    document.getElementById('otpForm').addEventListener('submit', function(event) {
+      // Prevent form submission
+      event.preventDefault();
+
+      // Get the OTP value from the form input
+      var otp = document.getElementById('otpInput').value;
+
+      // Print the OTP value to the console
+      console.log('OTP:', otp);
+    });
+  </script> {% endcomment %}
+</body>
+</html>

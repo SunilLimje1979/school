@@ -1,0 +1,172 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .navbar-brand i.fa {
+            border: 1px solid white; /* Set border color to white */
+            padding: 3px; /* Add padding to increase space around the icon */
+            border-radius: 50%; /* Add border radius to make the border rounded */
+            color: white; /* Set text color to white */
+        }
+
+        .nav_text {
+            color: white; /* Set text color to white */
+            margin-left: 10px; /* Add left margin of 10px */
+        }
+
+        .middle-box {
+            {% comment %} border: 1px solid #ccc; {% endcomment %}
+            {% comment %} padding: 20px; {% endcomment %}
+            margin-top: 60px; /* Adjust as needed */
+            text-align: center;
+            width: 100%;
+            height: 500px;
+            position: relative; /* Make it relative to contain absolute elements */
+        }
+
+        .carousel-item img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .download-button {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            width: 90%;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            display: block;
+            text-align: center;
+            font-size: 18px;
+            text-decoration: none;
+            z-index: 1000;
+        }
+        .carousel-indicators li {
+            background-color: white;
+            border: 2px solid #28a745;
+            border-radius: 50%; /* Make indicators circular */
+            width: 12px;
+            height: 12px;
+            margin: 0 8px;
+        }
+    
+        .carousel-indicators .active {
+            background-color: #28a745;
+            border-color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(57,159,34);">
+    <a class="navbar-brand" href="{% url 'event' %}">
+        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+        <span class="nav_text">PHOTO</span> <!-- Bold text -->
+    </a>
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h4 style="font-size: 16px; margin-top: 4px;">{{ description }}</h4>
+
+            <div class="middle-box">
+                <!-- Carousel Indicators -->
+                <div id="imageSlider" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        {% for image_url in image_urls %}
+                            <li data-target="#imageSlider" data-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
+                        {% endfor %}
+                    </ol>
+                    <div class="carousel-inner">
+                        {% for image_url in image_urls %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <a href="{% url 'imagespecific' %}?image_url={{ image_url }}&circular_id={{ circular_id }}">
+                                    <img src="{{ image_url }}" class="d-block w-100" alt="Slide {{ forloop.counter }}">
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+                
+            </div>
+            <a href="#" id="download-button" class="download-button">Download All</a>
+        </div>
+    </div>
+</div>
+<script>
+    // Function to handle download all images
+    document.getElementById('download-button').addEventListener('click', function() {
+        // Create a zip object
+        var zip = new JSZip();
+        
+        // Select all images in the carousel
+        var images = document.querySelectorAll('.carousel-item img');
+        
+        // Loop through each image
+        images.forEach(function(image, index) {
+            // Get the image source URL
+            var imageUrl = image.getAttribute('src');
+            
+            // Split the URL to extract filename
+            var filename = imageUrl.split('/').pop();
+            
+            // Fetch the image
+            fetch(imageUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    // Add the image to the zip file with a name
+                    zip.file(filename, blob);
+                    
+                    // If it's the last image, initiate the download
+                    if (index === images.length - 1) {
+                        zip.generateAsync({type:"blob"}).then(function(content) {
+                            // Use FileSaver.js to save the zip file
+                            saveAs(content, "images.zip");
+                        });
+                    }
+                });
+        });
+    });
+</script>
+
+
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+</body>
+</html>

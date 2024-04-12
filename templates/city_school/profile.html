@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Profile</title>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Font Awesome CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<style>
+  .navbar-brand {
+    font-size: 22px;
+    font-weight: bold;
+  }
+
+  .navbar-brand i.fa {
+    border: 1px solid white; /* Set border color to white */
+    padding: 5px; /* Add padding to increase space around the icon */
+    border-radius: 50%; /* Add border radius to make the border rounded */
+    color: white; /* Set text color to white */
+  }
+
+  .nav_text {
+    color: white; /* Set text color to white */
+    margin-left: 10px; /* Add left margin of 10px */
+  }
+
+  /* Additional styles for the profile card */
+  .profile-icon {
+    font-size: 80px; /* Increased icon size */
+    margin: auto;
+    margin-top: 10px; /* Added margin-top for space below */
+    margin-bottom: 20px; /* Added margin-bottom for space below */
+    border-radius: 50%;
+  }
+
+  .barcode {
+    border: 1px solid black;
+    width: 200px;
+    height: 60px;
+    margin: 20px auto;
+  }
+
+  /* Updated styles for labels */
+  .form-group {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .form-control {
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px; /* Decreased padding */
+    height: 55px; /* Decreased height */
+    font-size: 18px; /* Decreased font size */
+    color: black;
+    font-weight: bold;
+}
+
+.form-control + label {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    font-weight: bold;
+    color: black;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.form-control:focus + label,
+.form-control:not(:placeholder-shown) + label {
+    top: 15px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.5);
+    padding-bottom:10px;
+    padding-top:10px;
+}
+
+/* Additional style for displaying data below labels */
+.data-label {
+    font-size: 15px; /* Decreased font size */
+    font-weight: normal;
+    margin-top: 5px;
+    color: rgba(0, 0, 0, 0.7);
+    
+}
+
+  .container {
+    padding-top: 10px; /* Adjust the value as needed */
+    padding-left:0;
+    padding-right:0;
+  }
+  
+</style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: rgb(57,159,34);">
+    <a class="navbar-brand" href="{% url 'dashboard' %}">
+        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+        <span class="nav_text">Profile</span> <!-- Bold text -->
+    </a>
+</nav>
+
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-body text-center">
+      <i class="fas fa-user-circle profile-icon"></i> <!-- Profile Icon -->
+      <form action="#" method="post">
+        {% for student in matching_students %}
+        <div class="form-group">
+          <input type="text" id="id_no" name="id_no" class="form-control"  style="padding-top: 25px; font-size: 17px; padding-left: 20px;" required value="{{ student.adminno }}" readonly>
+          <label for="id_no">ID No:</label>
+         
+        </div>
+        <div class="form-group">
+          <input type="text" id="name" name="name" class="form-control"  style="padding-top: 25px; font-size: 17px; padding-left: 20px;" required value="{{ student.firstname }} {{ student.midname }} {{ student.lastname }}" readonly>
+          <label for="name">Name:</label>
+         
+        </div>
+        <div class="form-group">
+          <input type="text" id="gr_no" name="gr_no" class="form-control"  style="padding-top: 25px; font-size: 17px; padding-left: 20px;" required value="{{ student.grnno }}" readonly>
+          <label for="gr_no">GR No:</label>
+         
+        </div>
+        <div class="form-group">
+          <input type="text" id="roll_no" name="roll_no" class="form-control"  style="padding-top: 25px;font-size: 17px;  padding-left: 20px;" required value="{{ student.rollno }}" readonly>
+          <label for="roll_no">Roll No:</label>
+          
+        </div>
+        <div class="form-group">
+          <input type="text" id="contact_no" name="contact_no" class="form-control "  style="padding-top: 25px;font-size: 17px;  padding-left: 20px;" required value="{{ student.contact }}" readonly>
+          <label for="contact_no" >Contact No:</label>
+        
+        </div>
+        <div class="form-group">
+          <input type="text" id="class" name="class" class="form-control"  style="padding-top: 25px; font-size: 17px; padding-left: 20px;" required value="{{ student.classname }}" readonly>
+          <label for="class">Class:</label>
+        
+        </div>
+        <div class="form-group">
+          <input type="text" id="division" name="division" class="form-control"  style="padding-top: 25px;font-size: 17px;  padding-left: 20px;" required value="{{ student.division }}" readonly>
+          <label for="division">Division:</label>
+         
+        </div>
+        <div class="form-group">
+          <input type="text" id="address" name="address" class="form-control"  style="padding-top: 25px; font-size: 17px; padding-left: 20px;" required value="{{ student.address }}" readonly>
+          <label for="address">Address:</label>
+         
+        </div>
+        <div class="form-group">
+          <input type="text" id="blood_group" name="blood_group" class="form-control"  style="padding-top: 25px; font-size: 17px; padding-left: 20px;" required value="{{ student.bloodgroup }}" readonly>
+          <label for="blood_group">Blood Group:</label>
+        
+          <div class="form-group" style="padding-top: 10px;">
+            <!-- Display the barcode image with width 250px and height 100px -->
+            <img src="data:image/png;base64,{{ student.barcode_image }}" alt="Barcode" style="width: 250px; height: auto; max-height: 70px;" />
+        </div>
+        
+        <!-- Rectangular Barcode -->
+        {% endfor %}
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
+</html>
