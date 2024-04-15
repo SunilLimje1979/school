@@ -6,47 +6,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Page</title>
+  <title>OTP Page</title>
   <!-- Bootstrap CSS -->
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
+
+    body {
+      background-color: rgb(255, 251, 255);
+    }
     /* Custom Styles */
     .login-container {
-      max-width: 400px;
+      max-width: 350px;
       margin: auto;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-top: 200px;
+      margin-top: 20px;
+      background-color: rgb(255,251,255); 
     }
     .logo {
-      height: 230px; /* Adjust the height as needed */
-    }
-    .custom-btn {
-      width: 40%;
-      margin: auto;
-      margin-top: 25px; /* Add top margin */
+      height: 250px; /* Adjust the height as needed */
+      border-radius: 15px;
     }
     
-    .form-control {
-      height: 50px; /* Adjust the height as needed */
-      border-radius: 10px; /* Border radius */
-      border: 2px solid #ced4da; /* Border */
-      box-shadow: 0 0 5px rgba(0,0,0,0.1); /* Box shadow */
+    .custom-btn {
+      width: fit-content; /* This will make the button width fit its content */
     }
-    .input-group-prepend {
-      height: 50px;
-    }
-    .input-group-prepend .input-group-text {
-      background-color: #f8f9fa;
-      border: 2px solid #ced4da; /* Border for the icon */
-      border-right: none; /* Remove right border */
-      border-radius: 10px 0 0 10px; /* Adjust border radius */
-    }
-    .input-group-prepend .input-group-text i {
-      padding: 12px; /* Adjust padding to center the icon */
+    .text-muted {
+      font-size: 14px;
     }
 
     .icon-container {
@@ -59,7 +47,6 @@
       border-right: none;
       border-radius: 10px 0 0 10px;
     }
-    
   </style>
 </head>
 <body>
@@ -71,46 +58,56 @@
         </div>
         <form method="post">
           {% csrf_token %}
-          <div class="form-group">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <div class="input-group-prepend">
-                  <span class="input-group-text icon-container"><i class="fas fa-mobile-alt fa-lg"></i></span>
+          <div class="row">
+            <div class="col-md-6 col-12 mb-3">
+              <div class="input-group">
+                <span class="input-group-text" style="width: 50px;"><i class="fas fa-mobile-alt" style="font-size: 34px;"></i></span>
+                <div class="form-floating">
+                  <input type="text" class="form-control" name="otp" id="otpInput" placeholder="OTP (6 Digit)" style="height: 40px; font-size: 20px; background-color: #ffffff;">
+                  <label for="investigation_name">OTP (6 Digit) </label>
                 </div>
               </div>
-              <input type="text" class="form-control" name="otp" id="otpInput" placeholder="OTP (6 Digit)">
             </div>
           </div>
-          <button type="submit" class="btn btn-success btn-block custom-btn" id="proceedBtn">
-            Proceed
-          </button>
+          <div class="row justify-content-center" style="padding-top: 30px; padding-bottom: 3px;">
+            <button type="submit" class="btn btn-success custom-btn" id="proceedBtn" style="font-size: 17px; padding: 8px 18px; border-radius: 30px; background-color: rgb(57,159,34);">Proceed</button>
+        </div>
+        
           <p class="text-muted mt-3">Wait for 2 minutes to receive OTP.</p>
+          {% if messages %}
+          <div id="messages-container" class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
         </form>
-        
-        
       </div>
     </div>
   </div>
-
   <!-- Bootstrap JS -->
+  <script>
+    // Close the alert when the close button is clicked
+    document.addEventListener('DOMContentLoaded', function() {
+      var alertCloseButtons = document.querySelectorAll('.btn-close');
+      alertCloseButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+          var alert = this.closest('.alert');
+          alert.classList.add('fade');
+          setTimeout(function() {
+            alert.remove();
+          }, 500); // Adjust the timeout duration as needed
+        });
+      });
+    });
+  </script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <!-- Font Awesome -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-
-  <!-- Custom JavaScript -->
-  {% comment %} <script>
-    document.getElementById('otpForm').addEventListener('submit', function(event) {
-      // Prevent form submission
-      event.preventDefault();
-
-      // Get the OTP value from the form input
-      var otp = document.getElementById('otpInput').value;
-
-      // Print the OTP value to the console
-      console.log('OTP:', otp);
-    });
-  </script> {% endcomment %}
 </body>
 </html>

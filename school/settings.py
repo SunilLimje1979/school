@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'school.wsgi.application'
 
 STATIC_URL = "/school/static/"
 STATICFILES_DIRS = [
-    BASE_DIR / "static"
+    BASE_DIR / "school/static"
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 

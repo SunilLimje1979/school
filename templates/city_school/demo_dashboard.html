@@ -1,617 +1,130 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+def Circular(request):
+    # Retrieve the API data from the session
+    api_data = json.loads(request.session.get('api_data', '[]'))
 
-    <!-- Font Awesome CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    if api_data:
+        # Extract necessary fields from api_data
+        custid = api_data[0].get('custid', '')
+        grno = api_data[0].get('grno', '')
+        classid = api_data[0].get('classid', '')
+        divid = api_data[0].get('divid', '')
+        access = api_data[0].get('access', '')
+        mobile_number = api_data[0].get('mobile', '')
 
-    <!-- Custom CSS -->
-    <style>
-        .navbar-toggler {
-            color: white;
-            border: none;
-            background: transparent;
-            display: flex;
-            align-items: center; /* Align items vertically */
+        # Update the payload with the retrieved values
+        payload = {
+            "custid": custid,
+            "grno": grno,
+            "type": "CIRCULAR",
+            "classid": classid,
+            "divid": divid,
+            "access": access,
+            "mobile": mobile_number
         }
 
-        .navbar-toggler-icon {
-            margin-right: 20px; /* Add a margin between icon and text */
-            
-        }
+        # API endpoint
+        api_url = "https://mispack.in/app/admin/public/gettype"
 
-        .nav_text {
-            color: white;
-            margin-left: 5px; /* Adjust margin as needed */
-            font-size: 20px; /* Increase font size */
-            font-weight: bold; /* Make text bold */
-        }
+        try:
+            # Make a POST request to the API with SSL verification bypassed
+            response = requests.post(api_url, json=payload, verify=False)
+
+            # Check if the request was successful (status code 200)
+            if response.status_code == 200:
+                # Parse the JSON response
+                data = response.json()
+
+                # Extract assignments from the response
+                circulars = [{
+                    "type": circular['type'],
+                    'date': circular['date'],
+                    'description': circular['description'],
+                    'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"  # Adjust the link format as per your requirement
+                } for circular in data.get('response', [])]
+
+                # Prepare the context to pass to the template
+                context = {'circulars': circulars, 'api_data': api_data}
+
+                # Render the template with the context
+                return render(request, 'city_school/circular.html', context)
+            else:
+                # Handle errors, for example, by returning an error page
+                return HttpResponse("Error occurred while fetching data from the API")
+        except requests.exceptions.RequestException as e:
+            # Handle connection or request errors
+            return render(request, 'error.html', {'message': f'Error: {e}'})
+    else:
+        # Handle the case when api_data is empty
+        return render(request, 'error.html', {'message': 'API data not found in session'})
+
+
+
+
+
+
+
+
+
+
         
-        .custom-toggler {
-            margin: 2px; /* Adjust margin as needed */
-            border: none;
-            background: transparent;
-        }
+def Event(request):
+# Sample dynamic data
+api_data = json.loads(request.session.get('api_data', '[]'))
+
+if api_data:
+   # Extract necessary fields from api_data
+   custid = api_data[0].get('custid', '')
+   grno = api_data[0].get('grno', '')
+   classid = api_data[0].get('classid', '')
+   divid = api_data[0].get('divid', '')
+   access = api_data[0].get('access', '')
+   mobile_number = api_data[0].get('mobile', '')
+
+   # Update the payload with the retrieved values
+   payload = {
+       "custid": custid,
+       "grno": grno,
+       "type": "EVENTS",
+       "classid": classid,
+       "divid": divid,
+       "access": access,
+       "mobile": mobile_number
+   }
+
+   # API endpoint
+   api_url = "https://mispack.in/app/admin/public/gettype"
+
+   try:
+       # Make a POST request to the API with SSL verification bypassed
+       response = requests.post(api_url, json=payload, verify=False)
+
+       # Check if the request was successful (status code 200)
+       if response.status_code == 200:
+           # Parse the JSON response
+           data = response.json()
+
+          # Extract assignments from the response
+           circulars = [{
+               "id":circular['id'],
+               "type": circular['type'],
+               'date': circular['date'],
+               'description': circular['description'],
+               'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"  # Adjust the link format as per your requirement
+           } for circular in data.get('response', [])]
+
+           # Prepare the context to pass to the template
+           context = {'circulars': circulars, 'api_data': api_data}
+
+           # Render the template with the context
+           return render(request,'city_school/event.html', context)
+       else:
+           # Handle errors, for example, by returning an error page
+           return HttpResponse("Error occurred while fetching data from the API")
+   except requests.exceptions.RequestException as e:
+       # Handle connection or request errors
+       return render(request, 'error.html', {'message': f'Error: {e}'})
+else:
+   # Handle the case when api_data is empty
+   return render(request, 'error.html', {'message': 'API data not found in session'})
 
-        .offcanvas-header {
-            background-color: green; /* Set background color */
-            padding: 10px; /* Add padding */
-            border-bottom: 1px solid #ced4da; /* Add a bottom border */
-        }
-
-        .offcanvas-header i {
-            margin-right: 10px; /* Add margin between the icon and text */
-            color: white; /* Set icon color to white */
-        }
-    </style>
-
-    <title>Hello, world!</title>
-</head>
-
-<body>
-    <nav class="navbar navbar-light bg-success fixed-top">
-        <div class="container-fluid">
-            <!-- Wrapper for Icon and Text -->
-            <div class="d-flex align-items-center"> <!-- Make the wrapper flex and align items vertically -->
-                <!-- Drawer Icon and "Home-Shekhar" Text -->
-                <button class="navbar-toggler custom-toggler" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-                    <i class="fas fa-bars"></i> <!-- Font Awesome drawer icon -->
-                </button>
-                <span class="nav_text">Home - Shekhar</span>
-            </div>
-
-            <!-- Offcanvas Content -->
-            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar"
-                aria-labelledby="offcanvasNavbarLabel">
-                <div class="offcanvas-header">
-                    <i class="fas fa-user fa-3x"></i> <!-- Font Awesome user icon -->
-                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
-                        aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    <!-- Navbar Links -->
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard <!-- Font Awesome icon -->
-                                <span class="nav_text">  Dashboard</span> <!-- Bold text -->
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-history"></i> Pending Acceptance <!-- Font Awesome icon -->
-                                <span class="nav_text">Pending Acceptance</span> <!-- Bold text -->
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'my_students' %}">
-                                <i class="fas fa-users" style="color: black;"></i><!-- Font Awesome icon -->
-                                <span class="nav_text" style="color: black;">My Students</span> <!-- Bold text -->
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-sign-out-alt"></i> Exit <!-- Font Awesome icon -->
-                                <span class="nav_text">Exit</span> <!-- Bold text -->
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Bootstrap Bundle with Popper -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-</body>
-
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Profile</title>
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Font Awesome CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
-<style>
-  .navbar-brand {
-    font-size: 24px;
-    font-weight: bold;
-  }
-
-  .navbar-brand i.fa {
-    border: 1px solid white; /* Set border color to white */
-    padding: 5px; /* Add padding to increase space around the icon */
-    border-radius: 50%; /* Add border radius to make the border rounded */
-    color: white; /* Set text color to white */
-  }
-
-  .nav_text {
-    color: white; /* Set text color to white */
-    margin-left: 10px; /* Add left margin of 10px */
-  }
-
-
-</style>
-</head>
-<body>
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-success">
-    <a class="navbar-brand" href="{% url 'dashboard' %}">
-        <i class="fa fa-arrow-left" aria-hidden="true"></i>
-        <span class="nav_text">Attendance</span> <!-- Bold text -->
-    </a>
-</nav>
-
-
-
-<script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{% load i18n %}
-{% load static %}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Profile</title>
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Font Awesome CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
-<style>
-  .navbar-brand {
-    font-size: 24px;
-    font-weight: bold;
-  }
-
-  .navbar-brand i.fa {
-    border: 1px solid white; /* Set border color to white */
-    padding: 5px; /* Add padding to increase space around the icon */
-    border-radius: 50%; /* Add border radius to make the border rounded */
-    color: white; /* Set text color to white */
-  }
-
-  .nav_text {
-    color: white; /* Set text color to white */
-    margin-left: 10px; /* Add left margin of 10px */
-  }
-
-</style>
-</head>
-<body>
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-success">
-    <a class="navbar-brand" href="{% url 'dashboard' %}">
-        <i class="fa fa-arrow-left" aria-hidden="true"></i>
-        <span class="nav_text">Media</span> <!-- Bold text -->
-    </a>
-</nav>
-
-<div id="imageSlider" class="carousel slide" data-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="{% static 'assets/img/city_school_logo.jpg' %}" class="d-block w-100" alt="Slide 1">
-    </div>
-    <div class="carousel-item">
-        <img src="{% static 'assets/img/kuku.png' %}" class="d-block w-100" alt="Slide 2">
-    </div>
-    <div class="carousel-item">
-        <img src="{% static 'assets/img/main.jpg' %}"class="d-block w-100" alt="Slide 3">
-    </div>
-  </div>
-  <a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="sr-only">Previous</span>
-  </a>
-  <a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="sr-only">Next</span>
-  </a>
-</div>
-
-<script src="https://kit.fontawesome.com/a076d05399.js"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-</body>
-</html>
-
-
-
-
-
-
-dashbaord //code.jquery.com/jquery
-
-
-
-{% load i18n %}
-{% load static %}
-
-
-<!doctype html>
-<html lang="en">
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <!-- Font Awesome CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <style>
-        .navbar-toggler {
-            color: white;
-            border: none;
-            background: transparent;
-            display: flex;
-            align-items: center; /* Align items vertically */
-        }
-        .navbar {
-            padding: 11px 0; /* Adjust the top and bottom padding as needed */
-        }
-    
-        .navbar-toggler-icon {
-            margin-right: 20px; /* Add a margin between icon and text */
-            
-        }
-    
-        .nav_text {
-            color: white;
-            margin-left: 5px; /* Adjust margin as needed */
-            font-size: 22px; /* Increase font size */
-            font-weight: bold; /* Make text bold */
-        }
-        
-        .custom-toggler {
-            margin: 2px; /* Adjust margin as needed */
-            border: none;
-            background: transparent;
-        }
-    
-        .offcanvas-header {
-            background-color: green; /* Set background color */
-            padding: 10px; /* Add padding */
-            border-bottom: 1px solid #ced4da; /* Add a bottom border */
-        }
-        .offcanvas-body .nav-link {
-            border-bottom: 1px solid #000000; /* Change border color to black */
-        }
-        
-        .offcanvas-header i {
-            margin-right: 10px; /* Add margin between the icon and text */
-            color: white; /* Set icon color to white */
-        }
-      
-        .card {
-            background-color: orange;
-            margin: 0;
-            padding: 0;
-            {% comment %} margin-top: 0px;  {% endcomment %}
-        }
-    
-        .card-body {
-            padding: 1rem;
-            padding-top: 35px; /* Add top padding */
-            padding-bottom: 35px; /* Add bottom padding */
-        }
-        
-    
-        .card-text strong {
-            font-size: 24px;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: 10px; /* Add top padding */
-            right: 10px; /* Add right padding */
-            background-color: rgb(57,159,34);
-            color: white;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            font-size: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-    
-        .card-text i {
-            font-size: 4rem;
-        }
-        </style>
-        
-    </style>
-
-    <title>School App</title>
-</head>
-
-<body>
-    <nav class="navbar navbar-light fixed-top" style="background-color: rgb(57,159,34);">
-        <div class="container-fluid">
-            <!-- Wrapper for Icon and Text -->
-            <div class="d-flex align-items-center"> <!-- Make the wrapper flex and align items vertically -->
-                <!-- Drawer Icon and "Home-Shekhar" Text -->
-                <button class="navbar-toggler custom-toggler" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-                    <i class="fas fa-bars" style="margin-right: 10px; color: white;"></i>
-                </button>
-                <span class="nav_text" style="color: white;">Home - Shekhar</span>
-            </div>
-        </div>
-    </nav>
-    
-    
-   <!-- Offcanvas Content -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-    <div class="offcanvas-header d-flex justify-content-center align-items-center">
-        <img src="{% static 'assets/img/school.png' %}" alt="Veg Icon" style="width: 260px; height: 200px; border-radius: 10%;"> <!-- Image for the user -->
-        {% comment %} <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button> {% endcomment %}
-    </div>
-   
-    <div class="offcanvas-body">
-        <!-- Navbar Links -->
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard' %}">
-                    <i class="fas fa-tachometer-alt" style="color: black;"></i><!-- Font Awesome icon -->
-                    <span class="nav_text" style="color: black;">Dashboard</span> <!-- Bold text -->
-                </a>
-            </li>
-            
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'pending_acceptance' %}">
-                    <i class="fas fa-history" style="color: black;"></i>  <!-- Font Awesome icon -->
-                    <span class="nav_text" style="color: black;">Pending Acceptance</span> <!-- Bold text -->
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'my_students' %}">
-                    <i class="fas fa-users" style="color: black;"></i><!-- Font Awesome icon -->
-                    <span class="nav_text" style="color: black;">My Students</span> <!-- Bold text -->
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="fas fa-sign-out-alt" style="color: black;"></i>  <!-- Font Awesome icon -->
-                    <span class="nav_text" style="color: black;">Exit</span> <!-- Bold text -->
-                </a>
-            </li>
-        </ul>
-    </div>
-    
-</div>
-
-
-<!-- Main Content (Clickable Cards) -->
-<div class="container mt-5" style="padding-top: 20px;"> <!-- Add padding to the top -->
-    <div class="row row-cols-2"> <!-- Set row to contain 2 columns -->
-        <!-- Card 1 -->
-        <div class="col mb-4">
-            <a href="{% url 'profile' %}" style="color: black; text-decoration: none;">
-                <div class="card" style="background-color: rgb(237,112,20); width: 100%;">
-                    <div class="card-body text-center">
-                        <i class="fas fa-user-circle" style="font-size: 4rem; color: white;"></i>
-                        <p class="card-text"><strong style="font-size: 24px; color: white;">Profile</strong></p>
-                    </div>
-                </div>
-            </a>
-        </div>  
-
-        <!-- Card 2 -->
-        <div class="col mb-4">
-            <a href="{% url 'attendance' %}" style="color: black; text-decoration: none;">
-            <div class="card" style="background-color: rgb(237,112,20); width: 100%;">
-                <div class="card-body text-center">
-                    <i class="fas fa-calendar-check" style="font-size: 4rem;color: white;"></i>
-                    <span class="notification-badge">{{attendance_count }}</span> <!-- Notification badge -->
-                    <p class="card-text"><strong style="font-size: 24px;color: white;">Attendance</strong></p>
-                </div>
-            </div>   </a>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="col mb-4">
-            <a href="{% url 'circular' %}" style="color: black; text-decoration: none;">
-            <div class="card" style="background-color: rgb(237,112,20); width: 100%;">
-                <div class="card-body text-center">
-                    <i class="fas fa-bullhorn" style="font-size: 4rem;color: white;"></i>
-                    <span class="notification-badge">{{circular_count }}</span> <!-- Notification badge -->
-                    <p class="card-text"><strong style="font-size: 24px;color: white;">Circular</strong></p>
-                </div>
-            </div>   </a>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="col mb-4">
-            <a href="{% url 'assignment' %}" style="color: black; text-decoration: none;">
-                <div class="card" style="background-color: rgb(237,112,20); width: 100%;">
-                <div class="card-body text-center">
-                    <i class="fas fa-tasks" style="font-size: 4rem;color: white;"></i>
-                    <span class="notification-badge">{{homework_count }}</span> <!-- Notification badge -->
-                    <p class="card-text"><strong style="font-size: 24px;color: white;">Assignment</strong></p>
-                </div>
-            </div>   </a>
-        </div>
-
-        <!-- Card 5 -->
-        <div class="col mb-4">
-            <a href="{% url 'event' %}" style="color: black; text-decoration: none;">
-            <div class="card" style="background-color: rgb(237,112,20); width: 100%;">
-                <div class="card-body text-center">
-                    <i class="fas fa-calendar-alt" style="font-size: 4rem;color: white;"></i>
-                    <span class="notification-badge">{{events_count }}</span> <!-- Notification badge -->
-                    <p class="card-text"><strong style="font-size: 24px;color: white;">Event</strong></p>
-                </div>
-            </div></a>
-        </div>
-
-        <!-- Card 6 -->
-        <div class="col mb-4">
-            <a href="{% url 'examination' %}" style="color: black; text-decoration: none;">
-            <div class="card" style="background-color: rgb(237,112,20); width: 100%;">
-                <div class="card-body text-center">
-                    <i class="fas fa-file-alt" style="font-size: 4rem;color: white;"></i>
-                    <span class="notification-badge">{{examination_count}}</span> <!-- Notification badge -->
-                    <p class="card-text"><strong style="font-size: 24px;color: white;">Examination</strong></p>
-                </div>
-            </div></a>
-        </div>
-
-        <!-- Card 7 -->
-        <div class="col mb-4">
-            <a href="{% url 'fees' %}" style="color: black; text-decoration: none;">
-            <div class="card" style="background-color: rgb(237,112,20);width: 100%;">
-                <div class="card-body text-center">
-                    <i class="fas fa-money-bill" style="font-size: 4rem;color: white;"></i>
-                    <span class="notification-badge">{{fees_count }}</span> <!-- Notification badge -->
-                    <p class="card-text"><strong style="font-size: 24px;color: white;">Fees</strong></p>
-                </div>
-            </div></a>
-        </div>
-
-        <!-- Card 9 -->
-        <div class="col mb-4">
-            <a href="{% url 'media' %}" style="color: black; text-decoration: none;">
-            <div class="card" style="background-color: rgb(237,112,20); width: 100%;">
-                <div class="card-body text-center">
-                    <i class="fas fa-file-video" style="font-size: 4rem;color: white;"></i>
-                    <span class="notification-badge">{{transport_count}}</span> <!-- Notification badge -->
-                    <p class="card-text"><strong style="font-size: 24px;color: white;">Media</strong></p>
-                </div>
-            </div></a>
-        </div>
-
-
-       
-          
-    </div>
-</div>
-
-
-    <!-- Bootstrap Bundle with Popper -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-</body>
-
-</html>

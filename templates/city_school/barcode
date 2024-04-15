@@ -238,6 +238,8 @@ def store_admin_number(request):
 ##################################### Profile Page ##################################################################
 from django.conf import settings
 import os
+import base64
+
 def Profile(request):
     # Retrieve the selected admin numbers from the session
     selected_admin_numbers = request.session.get('selected_admin_numbers', [])
@@ -264,18 +266,28 @@ def Profile(request):
             matching_students = list({student['adminno']: student for student in matching_students}.values())
 
             # Generate barcode for each student
+            # for student in matching_students:
+            #     barcode_number = student.get('barcode', '')  # Assuming barcode number is stored in the 'barcode' field
+            #     code128 = Code128(barcode_number, writer=ImageWriter())
+            #     barcode_filepath = os.path.join(settings.STATIC_ROOT, 'your_folder_name', barcode_filename)
+            #     with open(temp_file, 'rb') as f:
+            #         barcode_image_data = f.read()
+            #         barcode_image_base64 = base64.b64encode(barcode_image_data).decode('utf-8')
+            #     student['barcode_image'] = barcode_image_base64
+                
+            # Assuming 'matching_students' is a list of dictionaries containing student data
             for student in matching_students:
                 barcode_number = student.get('barcode', '')  # Assuming barcode number is stored in the 'barcode' field
                 code128 = Code128(barcode_number, writer=ImageWriter())
-                temp_file = code128.save(os.path.join(settings.STATIC_ROOT,'assets', 'img', 'temp_barcode'))
-                # print(temp_file)
-                with open(temp_file, 'rb') as f:
+                barcode_filename = f"{barcode_number}"  # You can change the extension as needed
+                barcode_filepath = os.path.join(settings.STATIC_ROOT, 'assets', 'img' , barcode_filename)  # Adjusted path
+                code128.save(barcode_filepath)
+                print(code128.save(barcode_filepath))
+
+                with open(barcode_filepath, 'rb') as f:
                     barcode_image_data = f.read()
                     barcode_image_base64 = base64.b64encode(barcode_image_data).decode('utf-8')
                 student['barcode_image'] = barcode_image_base64
-                
-            # Store the API data in the session
-            request.session['api_data'] = json.dumps(matching_students)
 
             # Pass the matching student data to the template for rendering
             return render(request, 'city_school/profile.html', {'selected_admin_numbers': selected_admin_numbers, 'matching_students': matching_students})
@@ -439,72 +451,63 @@ def Attendance(request):
 ##################################### Circular Page ##################################################################
 
 def Circular(request):
-    # Retrieve student data from session
-    student_data = request.session.get('student_data', {})
-   
-    # Extract mobile number and adminno
-    mobile_number = ''
-    adminno = ''
-    for key, data in student_data.items():
-        mobile_number = data.get('contact', '')
-        adminno = data.get('adminno', '')
-        if mobile_number and adminno:
-            break  # Stop looping if both mobile number and adminno are found
+    # Retrieve the API data from the session
+    api_data = json.loads(request.session.get('api_data', '[]'))
 
-    # API parameters for circulars
-    api_params_circulars = {
-        "custid": student_data['1']['custid'],
-        "grno": student_data['1']['grnno'],
-        "type": "CIRCULAR",
-        "classid": student_data['1']['classid'],
-        "divid": student_data['1']['division'],
-        "access": "Parent",
-        "mobile": mobile_number
-    }
-    
-    # API endpoint for circulars
-    api_url_circulars = "https://mispack.in/app/admin/public/gettype"
+    if api_data:
+        # Extract necessary fields from api_data
+        custid = api_data[0].get('custid', '')
+        grno = api_data[0].get('grno', '')
+        classid = api_data[0].get('classid', '')
+        divid = api_data[0].get('divid', '')
+        access = api_data[0].get('access', '')
+        mobile_number = api_data[0].get('mobile', '')
 
-    try:
-        # Make a POST request to fetch circulars data with SSL verification bypassed
-        response_circulars = requests.post(api_url_circulars, json=api_params_circulars, verify=False)
+        # Update the payload with the retrieved values
+        payload = {
+            "custid": custid,
+            "grno": grno,
+            "type": "CIRCULAR",
+            "classid": classid,
+            "divid": divid,
+            "access": access,
+            "mobile": mobile_number
+        }
 
-        # Check if the request was successful (status code 200)
-        if response_circulars.status_code == 200:
-            # Parse the JSON response for circulars
-            data_circulars = response_circulars.json()
+        # API endpoint
+        api_url = "https://mispack.in/app/admin/public/gettype"
 
-            # Extract circulars from the response
-            circulars = [{
-                "type": circular['type'],
-                'date': circular['date'],
-                'description': circular['description'],
-                'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"
-            } for circular in data_circulars.get('response', [])]
+        try:
+            # Make a POST request to the API with SSL verification bypassed
+            response = requests.post(api_url, json=payload, verify=False)
 
-            # Prepare the context to pass to the template
-            context = {'circulars': circulars}
+            # Check if the request was successful (status code 200)
+            if response.status_code == 200:
+                # Parse the JSON response
+                data = response.json()
 
-            # Send POST request to update message count API
-            api_params_update_message_count = {
-                "type": "CIRCULAR",
-                "contact": mobile_number,
-                "adminno": adminno
-            }
-           
-            api_url_update_message_count = "https://mispack.in/app/admin/public/updatemessagecount"
-            
-            # Make a POST request to update message count with SSL verification bypassed
-            requests.post(api_url_update_message_count, json=api_params_update_message_count, verify=False)
+                # Extract assignments from the response
+                circulars = [{
+                    "type": circular['type'],
+                    'date': circular['date'],
+                    'description': circular['description'],
+                    'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"  # Adjust the link format as per your requirement
+                } for circular in data.get('response', [])]
 
-            # Render the template with the context
-            return render(request, 'city_school/circular.html', context)
-        else:
-            # Handle errors, for example, by returning an error page
-            return HttpResponse("Error occurred while fetching data from the API")
-    except requests.exceptions.RequestException as e:
-        # Handle connection or request errors
-        return render(request, 'error.html', {'message': f'Error: {e}'})
+                # Prepare the context to pass to the template
+                context = {'circulars': circulars, 'api_data': api_data}
+
+                # Render the template with the context
+                return render(request, 'city_school/circular.html', context)
+            else:
+                # Handle errors, for example, by returning an error page
+                return HttpResponse("Error occurred while fetching data from the API")
+        except requests.exceptions.RequestException as e:
+            # Handle connection or request errors
+            return render(request, 'error.html', {'message': f'Error: {e}'})
+    else:
+        # Handle the case when api_data is empty
+        return render(request, 'error.html', {'message': 'API data not found in session'})
 
 ##################################### Assigment page ##################################################################
 
@@ -581,135 +584,67 @@ def Assignment(request):
 
 ##################################### Event Page ##################################################################
 
-# def Event(request):
-#      # Sample dynamic data
-#     api_data = json.loads(request.session.get('api_data', '[]'))
-
-#     if api_data:
-#         # Extract necessary fields from api_data
-#         custid = api_data[0].get('custid', '')
-#         grno = api_data[0].get('grno', '')
-#         classid = api_data[0].get('classid', '')
-#         divid = api_data[0].get('divid', '')
-#         access = api_data[0].get('access', '')
-#         mobile_number = api_data[0].get('mobile', '')
-
-#         # Update the payload with the retrieved values
-#         payload = {
-#             "custid": custid,
-#             "grno": grno,
-#             "type": "EVENTS",
-#             "classid": classid,
-#             "divid": divid,
-#             "access": access,
-#             "mobile": mobile_number
-#         }
-
-#         # API endpoint
-#         api_url = "https://mispack.in/app/admin/public/gettype"
-
-#         try:
-#             # Make a POST request to the API with SSL verification bypassed
-#             response = requests.post(api_url, json=payload, verify=False)
-
-#             # Check if the request was successful (status code 200)
-#             if response.status_code == 200:
-#                 # Parse the JSON response
-#                 data = response.json()
-
-#                # Extract assignments from the response
-#                 circulars = [{
-#                     "id":circular['id'],
-#                     "type": circular['type'],
-#                     'date': circular['date'],
-#                     'description': circular['description'],
-#                     'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"  # Adjust the link format as per your requirement
-#                 } for circular in data.get('response', [])]
-
-#                 # Prepare the context to pass to the template
-#                 context = {'circulars': circulars, 'api_data': api_data}
-
-#                 # Render the template with the context
-#                 return render(request,'city_school/event.html', context)
-#             else:
-#                 # Handle errors, for example, by returning an error page
-#                 return HttpResponse("Error occurred while fetching data from the API")
-#         except requests.exceptions.RequestException as e:
-#             # Handle connection or request errors
-#             return render(request, 'error.html', {'message': f'Error: {e}'})
-#     else:
-#         # Handle the case when api_data is empty
-#         return render(request, 'error.html', {'message': 'API data not found in session'})
-    
 def Event(request):
-    # Retrieve student data from session
-    student_data = request.session.get('student_data', {})
-   
-    # Extract mobile number and adminno
-    mobile_number = ''
-    adminno = ''
-    for key, data in student_data.items():
-        mobile_number = data.get('contact', '')
-        adminno = data.get('adminno', '')
-        if mobile_number and adminno:
-            break  # Stop looping if both mobile number and adminno are found
+     # Sample dynamic data
+    api_data = json.loads(request.session.get('api_data', '[]'))
 
-    # API parameters for circulars
-    api_params_circulars = {
-        "custid": student_data['1']['custid'],
-        "grno": student_data['1']['grnno'],
-        "type": "EVENTS",
-        "classid": student_data['1']['classid'],
-        "divid": student_data['1']['division'],
-        "access": "Parent",
-        "mobile": mobile_number
-    }
+    if api_data:
+        # Extract necessary fields from api_data
+        custid = api_data[0].get('custid', '')
+        grno = api_data[0].get('grno', '')
+        classid = api_data[0].get('classid', '')
+        divid = api_data[0].get('divid', '')
+        access = api_data[0].get('access', '')
+        mobile_number = api_data[0].get('mobile', '')
+
+        # Update the payload with the retrieved values
+        payload = {
+            "custid": custid,
+            "grno": grno,
+            "type": "EVENTS",
+            "classid": classid,
+            "divid": divid,
+            "access": access,
+            "mobile": mobile_number
+        }
+
+        # API endpoint
+        api_url = "https://mispack.in/app/admin/public/gettype"
+
+        try:
+            # Make a POST request to the API with SSL verification bypassed
+            response = requests.post(api_url, json=payload, verify=False)
+
+            # Check if the request was successful (status code 200)
+            if response.status_code == 200:
+                # Parse the JSON response
+                data = response.json()
+
+               # Extract assignments from the response
+                circulars = [{
+                    "id":circular['id'],
+                    "type": circular['type'],
+                    'date': circular['date'],
+                    'description': circular['description'],
+                    'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"  # Adjust the link format as per your requirement
+                } for circular in data.get('response', [])]
+
+                # Prepare the context to pass to the template
+                context = {'circulars': circulars, 'api_data': api_data}
+
+                # Render the template with the context
+                return render(request,'city_school/event.html', context)
+            else:
+                # Handle errors, for example, by returning an error page
+                return HttpResponse("Error occurred while fetching data from the API")
+        except requests.exceptions.RequestException as e:
+            # Handle connection or request errors
+            return render(request, 'error.html', {'message': f'Error: {e}'})
+    else:
+        # Handle the case when api_data is empty
+        return render(request, 'error.html', {'message': 'API data not found in session'})
     
-    # API endpoint for circulars
-    api_url_circulars = "https://mispack.in/app/admin/public/gettype"
-
-    try:
-        # Make a POST request to fetch circulars data with SSL verification bypassed
-        response_circulars = requests.post(api_url_circulars, json=api_params_circulars, verify=False)
-
-        # Check if the request was successful (status code 200)
-        if response_circulars.status_code == 200:
-            # Parse the JSON response for circulars
-            data_circulars = response_circulars.json()
-
-            # Extract circulars from the response
-            circulars = [{
-                "id":circular['id'],
-                "type": circular['type'],
-                'date': circular['date'],
-                'description': circular['description'],
-                'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"
-            } for circular in data_circulars.get('response', [])]
-
-            # Prepare the context to pass to the template
-            context = {'circulars': circulars}
-
-            # Send POST request to update message count API
-            api_params_update_message_count = {
-                "type": "EVENTS",
-                "contact": mobile_number,
-                "adminno": adminno
-            }
-           
-            api_url_update_message_count = "https://mispack.in/app/admin/public/updatemessagecount"
-            
-            # Make a POST request to update message count with SSL verification bypassed
-            requests.post(api_url_update_message_count, json=api_params_update_message_count, verify=False)
-
-            # Render the template with the context
-            return render(request, 'city_school/event.html', context)
-        else:
-            # Handle errors, for example, by returning an error page
-            return HttpResponse("Error occurred while fetching data from the API")
-    except requests.exceptions.RequestException as e:
-        # Handle connection or request errors
-        return render(request, 'error.html', {'message': f'Error: {e}'})
-
+    
 
 ##################################### Examination Page ##################################################################
 
