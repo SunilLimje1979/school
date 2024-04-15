@@ -238,6 +238,54 @@ def store_admin_number(request):
 ##################################### Profile Page ##################################################################
 from django.conf import settings
 import os
+# def Profile(request):
+#     # Retrieve the selected admin numbers from the session
+#     selected_admin_numbers = request.session.get('selected_admin_numbers', [])
+
+#     # Retrieve the mobile number from the session
+#     mobile_number = request.session.get('mobile_number')
+
+#     # Make a request to the API to get all students
+#     api_url = 'https://mispack.in/app/admin/public/getAllStudent'
+#     data = {'mobile': mobile_number}
+    
+#     try:
+#         response = requests.post(api_url, json=data, verify=False)  # Bypass SSL verification
+
+#         # Check if the request was successful
+#         if response.status_code == 200:
+#             # Extract data from the API response
+#             api_data = response.json().get('data', {})
+            
+#             # Filter the data based on selected_admin_numbers
+#             matching_students = [student_data for student_data in api_data.values() if student_data.get('adminno') in selected_admin_numbers]
+            
+#             # Remove duplicate entries
+#             matching_students = list({student['adminno']: student for student in matching_students}.values())
+
+#             # Generate barcode for each student
+#             for student in matching_students:
+#                 barcode_number = student.get('barcode', '')  # Assuming barcode number is stored in the 'barcode' field
+#                 code128 = Code128(barcode_number, writer=ImageWriter())
+#                 temp_file = code128.save(os.path.join(settings.STATIC_IMG_ROOT,'assets', 'img', 'temp_barcode'))
+#                 # print(temp_file)
+#                 with open(temp_file, 'rb') as f:
+#                     barcode_image_data = f.read()
+#                     barcode_image_base64 = base64.b64encode(barcode_image_data).decode('utf-8')
+#                 student['barcode_image'] = barcode_image_base64
+                
+#             # Store the API data in the session
+#             request.session['api_data'] = json.dumps(matching_students)
+
+#             # Pass the matching student data to the template for rendering
+#             return render(request, 'city_school/profile.html', {'selected_admin_numbers': selected_admin_numbers, 'matching_students': matching_students})
+#         else:
+#             # Handle API request failure
+#             return render(request, 'error.html', {'message': 'Failed to fetch student data from the API'})
+#     except requests.exceptions.RequestException as e:
+#         # Handle connection or request errors
+#         return render(request, 'error.html', {'message': f'Error: {e}'})
+
 def Profile(request):
     # Retrieve the selected admin numbers from the session
     selected_admin_numbers = request.session.get('selected_admin_numbers', [])
@@ -262,20 +310,6 @@ def Profile(request):
             
             # Remove duplicate entries
             matching_students = list({student['adminno']: student for student in matching_students}.values())
-
-            # Generate barcode for each student
-            for student in matching_students:
-                barcode_number = student.get('barcode', '')  # Assuming barcode number is stored in the 'barcode' field
-                code128 = Code128(barcode_number, writer=ImageWriter())
-                temp_file = code128.save(os.path.join(settings.STATIC_IMG_ROOT,'assets', 'img', 'temp_barcode'))
-                # print(temp_file)
-                with open(temp_file, 'rb') as f:
-                    barcode_image_data = f.read()
-                    barcode_image_base64 = base64.b64encode(barcode_image_data).decode('utf-8')
-                student['barcode_image'] = barcode_image_base64
-                
-            # Store the API data in the session
-            request.session['api_data'] = json.dumps(matching_students)
 
             # Pass the matching student data to the template for rendering
             return render(request, 'city_school/profile.html', {'selected_admin_numbers': selected_admin_numbers, 'matching_students': matching_students})

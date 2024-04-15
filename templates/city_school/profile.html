@@ -1,3 +1,6 @@
+{% load i18n %}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -155,10 +158,17 @@
           <input type="text" id="blood_group" name="blood_group" class="form-control"  style="padding-top: 25px; font-size: 17px; padding-left: 20px;" required value="{{ student.bloodgroup }}" readonly>
           <label for="blood_group">Blood Group:</label>
         
-          <div class="form-group" style="padding-top: 10px;">
+          {% comment %} <div class="form-group" style="padding-top: 10px;">
             <!-- Display the barcode image with width 250px and height 100px -->
             <img src="data:image/png;base64,{{ student.barcode_image }}" alt="Barcode" style="width: 250px; height: auto; max-height: 70px;" />
-        </div>
+        </div> {% endcomment %}
+
+        <div class="form-group" style="padding-top: 10px;">
+          <!-- Display the offline barcode image -->
+          <img src="{% static 'assets/img/barcode.png' %}"  alt="Barcode" style="width: 250px; height: auto; max-height: 70px;" />
+      </div>
+      
+      
         
         <!-- Rectangular Barcode -->
         {% endfor %}
