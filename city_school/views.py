@@ -267,7 +267,7 @@ def Profile(request):
             for student in matching_students:
                 barcode_number = student.get('barcode', '')  # Assuming barcode number is stored in the 'barcode' field
                 code128 = Code128(barcode_number, writer=ImageWriter())
-                temp_file = code128.save(os.path.join(settings.STATIC_ROOT,'assets', 'img', 'temp_barcode'))
+                temp_file = code128.save(os.path.join(settings.STATIC_IMG_ROOT,'assets', 'img', 'temp_barcode'))
                 # print(temp_file)
                 with open(temp_file, 'rb') as f:
                     barcode_image_data = f.read()
