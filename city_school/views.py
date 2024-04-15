@@ -560,7 +560,7 @@ def Assignment(request):
     api_params_circulars = {
         "custid": student_data['1']['custid'],
         "grno": student_data['1']['grnno'],
-        "type": "ATTENDANCE",
+        "type": "CIRCULAR",
         "classid": student_data['1']['classid'],
         "divid": student_data['1']['division'],
         "access": "Parent",
@@ -764,7 +764,7 @@ def Examination(request):
     api_params_circulars = {
         "custid": student_data['1']['custid'],
         "grno": student_data['1']['grnno'],
-        "type": "ATTENDANCE",
+        "type": "CIRCULAR",
         "classid": student_data['1']['classid'],
         "divid": student_data['1']['division'],
         "access": "Parent",
