@@ -858,7 +858,7 @@ def Fees(request):
                 "type": circular['type'],
                 'date': circular['date'],
                 'description': circular['description'],
-                'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"
+                # 'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"
             } for circular in data_circulars.get('response', [])]
 
             # Prepare the context to pass to the template

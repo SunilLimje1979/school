@@ -111,9 +111,13 @@
               </div>
               <div class="user-date">{{ circular.date }}</div>
 
-              <a href="{% url 'pdf' %}?pdf_link={{ circular.pdf_link }}&description={{ circular.description }}&type={{ circular.type }}" class="pdf-icon">
+              {% comment %} <a href="{% url 'pdf' %}?pdf_link={{ circular.pdf_link }}&description={{ circular.description }}&type={{ circular.type }}" class="pdf-icon">
                 <i class="far fa-file-pdf"></i> <!-- PDF icon -->
-            </a>
+            </a> {% endcomment %}
+            
+            <a href="{% url 'pdf' %}?description={{ circular.description }}&type={{ circular.type }}" class="pdf-icon">
+              <i class="far fa-file-pdf"></i> <!-- PDF icon -->
+          </a>
 
           </div>
           <div class="description">

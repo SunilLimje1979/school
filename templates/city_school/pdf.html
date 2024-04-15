@@ -89,23 +89,33 @@
     </nav>
     
     
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <!-- Display the description -->
-            <h4 style="font-size: 18px; padding-top: 8px;">{{ description }}</h4>
-
-            <!-- PDF Preview -->
-            <div class="middle-box">
-                <iframe src="{{ pdf_link }}"></iframe>
+    {% if pdf_link %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <!-- Display the description -->
+                <h4 style="font-size: 18px; padding-top: 8px;">{{ description }}</h4>
+    
+                <!-- PDF Preview -->
+                <div class="middle-box">
+                    <iframe src="{{ pdf_link }}"></iframe>
+                </div>
+                <!-- Download button -->
+                {% comment %} <a id="downloadLink" href="#" class="download-button">Download PDF</a> {% endcomment %}
             </div>
-            <!-- Download button -->
-            {% comment %} <a id="downloadLink" href="#" class="download-button">Download PDF</a> {% endcomment %}
         </div>
     </div>
-</div>
-
+    {% else %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h4 style="font-size: 18px; padding-top: 8px;">{{ description |linebreaksbr }}</h4>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    
 
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 {% comment %} <script>
