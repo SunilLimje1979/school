@@ -19,14 +19,16 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 ##################################### Log In Page ##################################################################
 def Login(request):
     if request.method == "GET":
-        return render(request, 'city_school/login.html')
+        if 'mobile_number' in request.session:
+            return redirect('dashboard') 
+        else:
+            return render(request, 'city_school/login.html')
     elif request.method == "POST":
         # Get mobile number from POST data
         mobile_number = request.POST.get('mobileNumber')
         print("Mobile Number:", mobile_number)
         
-        # Store mobile number in session
-        request.session['mobile_number'] = mobile_number
+        
         
         # Disable SSL certificate verification (for development purposes)
         requests.packages.urllib3.disable_warnings()
@@ -48,6 +50,8 @@ def Login(request):
                     "ios_id": 0
                 }
                 otp_response = requests.post(otp_api_url, json=otp_data, verify=False)
+                # Store mobile number in session
+                request.session['mobile_number'] = mobile_number
                 return redirect('otp')  # Assuming 'otp' is the name of your OTP view
             
             else:
@@ -99,7 +103,7 @@ def Otp(request):
              # Store mobile number in session
             request.session['output'] = output
             # print(request.session['output'])
-            return redirect('dashboard')  # Assuming 'dashboard' is the name of your dashboard view
+            return redirect('my_students')  # Assuming 'dashboard' is the name of your dashboard view
         else:
             # If the login request was unsuccessful, return an error response
             messages.success(request, "Otp is not valid")
@@ -495,7 +499,7 @@ def Circular(request):
         "access": "Parent",
         "mobile": mobile_number
     }
-    
+    # print(api_params_circulars)
     # API endpoint for circulars
     api_url_circulars = "https://mispack.in/app/admin/public/gettype"
 
@@ -508,13 +512,22 @@ def Circular(request):
             # Parse the JSON response for circulars
             data_circulars = response_circulars.json()
 
+            # # Extract circulars from the response
+            # circulars = [{
+            #     "type": circular['type'],
+            #     'date': circular['date'],
+            #     'description': circular['description'],
+            #     'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"
+            # } for circular in data_circulars.get('response', [])]
+            
             # Extract circulars from the response
             circulars = [{
-                "type": circular['type'],
-                'date': circular['date'],
-                'description': circular['description'],
-                'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"
-            } for circular in data_circulars.get('response', [])]
+                "type": data_circulars['response'][key]['type'],
+                'date': data_circulars['response'][key]['date'],
+                'description': data_circulars['response'][key]['description'],
+                'pdf_link': f"https://www.mispack.in/app/application/main/{data_circulars['response'][key]['uid']}"
+            } for key in data_circulars.get('response', {}).keys()]
+
 
             # Prepare the context to pass to the template
             context = {'circulars': circulars}
@@ -581,11 +594,12 @@ def Assignment(request):
 
             # Extract circulars from the response
             circulars = [{
-                "type": circular['type'],
-                'date': circular['date'],
-                'description': circular['description'],
-                'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"
-            } for circular in data_circulars.get('response', [])]
+                "type": data_circulars['response'][key]['type'],
+                'date': data_circulars['response'][key]['date'],
+                'description': data_circulars['response'][key]['description'],
+                'pdf_link': f"https://www.mispack.in/app/application/main/{data_circulars['response'][key]['uid']}"
+            } for key in data_circulars.get('response', {}).keys()]
+
 
             # Prepare the context to pass to the template
             context = {'circulars': circulars}
@@ -785,11 +799,12 @@ def Examination(request):
 
             # Extract circulars from the response
             circulars = [{
-                "type": circular['type'],
-                'date': circular['date'],
-                'description': circular['description'],
-                'pdf_link': f"https://www.mispack.in/app/application/main/{circular['uid']}"
-            } for circular in data_circulars.get('response', [])]
+                "type": data_circulars['response'][key]['type'],
+                'date': data_circulars['response'][key]['date'],
+                'description': data_circulars['response'][key]['description'],
+                'pdf_link': f"https://www.mispack.in/app/application/main/{data_circulars['response'][key]['uid']}"
+            } for key in data_circulars.get('response', {}).keys()]
+
 
             # Prepare the context to pass to the template
             context = {'circulars': circulars}
@@ -1022,3 +1037,9 @@ def Imagespecific(request):
     circular_id = request.GET.get('circular_id', None)
     return render(request, 'city_school/imagespecific.html', {'image_url': image_url, 'circular_id': circular_id})
 
+##################################### Imagespecific Page ##################################################################
+def Logout(request):
+    # Clear all sessions
+    request.session.clear()
+    # Redirect to the login page
+    return redirect('login')

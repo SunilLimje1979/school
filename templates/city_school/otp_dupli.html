@@ -1,113 +1,479 @@
-{% load i18n %}
-{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Preview</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .navbar-brand i.fa {
+            border: 1px solid white; /* Set border color to white */
+            padding: 2px; /* Add padding to increase space around the icon */
+            border-radius: 50%; /* Add border radius to make the border rounded */
+            color: white; /* Set text color to white */
+            font-size: 30px;
+        }
+
+        .nav_text {
+            color: white; /* Set text color to white */
+            margin-left: 10px; /* Add left margin of 10px */
+            font-size: 22px;
+          }
+      .container {
+            margin-left: 0;
+            margin-right: 0;
+            padding-left: 0;
+            padding-right: 0;
+            width: 100%;
+        }
+
+        .middle-box {
+            {% comment %} border: 1px solid #ccc; {% endcomment %}
+            {% comment %} padding: 5px; {% endcomment %}
+            margin-top: 35px; /* Adjust as needed */
+            text-align: center;
+            position: relative; /* Make it relative to contain absolute elements */
+        }
+{% comment %} 
+        .download-button {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            width: 90%;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            display: block;
+            text-align: center;
+            font-size: 18px;
+            text-decoration: none;
+            z-index: 1000;
+        } {% endcomment %}
+
+        iframe {
+            width: 100%;
+            height: 670px;
+            border: none; /* Remove border */
+        }
+    </style>
+</head>
+<body>
+
+    {% comment %} <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(57,159,34);">
+        <a class="navbar-brand" href="{% url 'circular' %}">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            <span class="nav_text">{{ type |title|upper}}</span> <!-- Display the type value -->
+        </a>
+    </nav> {% endcomment %}
+
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(57,159,34);">
+        <a class="navbar-brand" href="{% if type == 'attendance' %}{% url 'attendance' %}
+                                      {% elif type == 'circular' %}{% url 'circular' %}
+                                      {% elif type == 'homework' %}{% url 'assignment' %}
+                                       {% elif type == 'examination' %}{% url 'examination' %}
+                                      {% elif type == 'fees' %}{% url 'fees' %}
+                                      {% elif type == 'payroll' %}{% url 'media' %}
+                                      {% endif %}">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            {% if type == 'payroll' %}
+                <span class="nav_text">MEDIA</span>
+            {% elif type == 'homework' %}
+                <span class="nav_text">ASSIGNMENT</span>
+            {% else %}
+                <span class="nav_text">{{ type|title|upper }}</span>
+            {% endif %}
+        </a>
+    </nav>
+    
+    
+    {% if pdf_link %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <!-- Display the description -->
+                <h4 style="font-size: 18px; padding-top: 8px;">{{ description }}</h4>
+    
+                <!-- PDF Preview -->
+                <div class="middle-box">
+                    <iframe src="https://drive.google.com/file/d/1aJoOnLQpndaZuI0ou2JJcZ5OODvpW29_/preview" width="100%" height="670px"></iframe>
+                </div>
+                
+                <!-- Download button -->
+                {% comment %} <a id="downloadLink" href="#" class="download-button">Download PDF</a> {% endcomment %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h4 style="font-size: 18px; padding-top: 8px;">{{ description |linebreaksbr }}</h4>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+{% comment %}     
+    <object
+            data="{{ pdf_link }}"
+            type="application/pdf"
+            width="100%"
+            height="250vh"
+        >
+            <iframe
+                src="{{ pdf_link }}"
+                width="100%"
+                height="250vh"
+                style="border: none;"
+            >
+                <p>
+                    Your browser does not support PDFs.
+                    <a href="{{ pdf_link }}">Download the PDF</a>.
+                </p>
+            </iframe>
+        </object> {% endcomment %}
+
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+{% comment %} <script>
+    document.getElementById("downloadLink").addEventListener("click", function() {
+        var link = document.createElement('a');
+        link.href = "{{ pdf_link }}";
+        link.setAttribute('download', 'downloaded_pdf.pdf');
+        link.click();
+    });
+</script> {% endcomment %}
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OTP Page</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Preview</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-    body {
-      background-color: rgb(255, 251, 255);
-    }
-    /* Custom Styles */
-    .login-container {
-      max-width: 350px;
-      margin: auto;
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 20px;
-      background-color: rgb(255,251,255); 
-    }
-    .logo {
-      height: 250px; /* Adjust the height as needed */
-      border-radius: 15px;
-    }
-    
-    .custom-btn {
-      width: fit-content; /* This will make the button width fit its content */
-    }
-    .text-muted {
-      font-size: 14px;
-    }
+        .navbar-brand i.fa {
+            border: 1px solid white; /* Set border color to white */
+            padding: 2px; /* Add padding to increase space around the icon */
+            border-radius: 50%; /* Add border radius to make the border rounded */
+            color: white; /* Set text color to white */
+            font-size: 30px;
+        }
 
-    .icon-container {
-      width: 50px; /* Set a fixed width */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #f8f9fa;
-      border: 2px solid #ced4da;
-      border-right: none;
-      border-radius: 10px 0 0 10px;
-    }
-  </style>
+        .nav_text {
+            color: white; /* Set text color to white */
+            margin-left: 10px; /* Add left margin of 10px */
+            font-size: 22px;
+        }
+
+        .container {
+            margin-left: 0;
+            margin-right: 0;
+            padding-left: 0;
+            padding-right: 0;
+            width: 100%;
+        }
+
+        .middle-box {
+            margin-top: 35px; /* Adjust as needed */
+            text-align: center;
+            position: relative; /* Make it relative to contain absolute elements */
+        }
+
+        iframe {
+            width: 100%;
+            height: 670px;
+            border: none; /* Remove border */
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="login-container">
-        <div class="text-center mb-4">
-          <img src="{% static 'assets/img/city_school_logo.jpg' %}"  alt="Your Logo" class="logo">
-        </div>
-        <form method="post">
-          {% csrf_token %}
-          <div class="row">
-            <div class="col-md-6 col-12 mb-3">
-              <div class="input-group">
-                <span class="input-group-text" style="width: 50px;"><i class="fas fa-mobile-alt" style="font-size: 34px;"></i></span>
-                <div class="form-floating">
-                  <input type="text" class="form-control" name="otp" id="otpInput" placeholder="OTP (6 Digit)" style="height: 40px; font-size: 20px; background-color: #ffffff;">
-                  <label for="investigation_name">OTP (6 Digit) </label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row justify-content-center" style="padding-top: 30px; padding-bottom: 3px;">
-            <button type="submit" class="btn btn-success custom-btn" id="proceedBtn" style="font-size: 17px; padding: 8px 18px; border-radius: 30px; background-color: rgb(57,159,34);">Proceed</button>
-        </div>
-        
-          <p class="text-muted mt-3">Wait for 2 minutes to receive OTP.</p>
-          {% if messages %}
-          <div id="messages-container" class="messages">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-          </div>
-          {% endif %}
 
-        </form>
-      </div>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(57,159,34);">
+        <a class="navbar-brand" href="{% if type == 'attendance' %}{% url 'attendance' %}
+                                      {% elif type == 'circular' %}{% url 'circular' %}
+                                      {% elif type == 'homework' %}{% url 'assignment' %}
+                                      {% elif type == 'examination' %}{% url 'examination' %}
+                                      {% elif type == 'fees' %}{% url 'fees' %}
+                                      {% elif type == 'payroll' %}{% url 'media' %}
+                                      {% endif %}">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            {% if type == 'payroll' %}
+                <span class="nav_text">MEDIA</span>
+            {% elif type == 'homework' %}
+                <span class="nav_text">ASSIGNMENT</span>
+            {% else %}
+                <span class="nav_text">{{ type|title|upper }}</span>
+            {% endif %}
+        </a>
+    </nav>
+    
+    {% if pdf_link %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <!-- Display the description -->
+                <h4 style="font-size: 18px; padding-top: 8px;">{{ description }}</h4>
+    
+                <!-- PDF Preview -->
+                <div class="middle-box">
+                    <canvas id="pdfCanvas"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <!-- Bootstrap JS -->
-  <script>
-    // Close the alert when the close button is clicked
-    document.addEventListener('DOMContentLoaded', function() {
-      var alertCloseButtons = document.querySelectorAll('.btn-close');
-      alertCloseButtons.forEach(function(button) {
-        button.addEventListener('click', function() {
-          var alert = this.closest('.alert');
-          alert.classList.add('fade');
-          setTimeout(function() {
-            alert.remove();
-          }, 500); // Adjust the timeout duration as needed
+    {% else %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h4 style="font-size: 18px; padding-top: 8px;">{{ description |linebreaksbr }}</h4>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+<script>
+    // Function to render the PDF onto the canvas
+    function renderPDF(url, canvasContainer) {
+        var loadingTask = pdfjsLib.getDocument(url);
+        loadingTask.promise.then(function(pdf) {
+            // Fetch the first page
+            pdf.getPage(1).then(function(page) {
+                var viewport = page.getViewport({scale: 1});
+                var canvas = document.createElement('canvas');
+                var context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                canvasContainer.appendChild(canvas);
+
+                // Render PDF page into canvas context
+                var renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                page.render(renderContext);
+            });
+        }, function(reason) {
+            // Error handling
+            console.error('Error: ' + reason);
         });
-      });
-    });
-  </script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <!-- Font Awesome -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    }
+
+    // Call the renderPDF function with the PDF link and canvas container
+    renderPDF('{{ pdf_link }}', document.getElementById('pdfCanvas').parentNode);
+</script>
+
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Preview</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .navbar-brand i.fa {
+            border: 1px solid white; /* Set border color to white */
+            padding: 2px; /* Add padding to increase space around the icon */
+            border-radius: 50%; /* Add border radius to make the border rounded */
+            color: white; /* Set text color to white */
+            font-size: 30px;
+        }
+
+        .nav_text {
+            color: white; /* Set text color to white */
+            margin-left: 10px; /* Add left margin of 10px */
+            font-size: 22px;
+        }
+
+        .container {
+            margin-left: 0;
+            margin-right: 0;
+            padding-left: 0;
+            padding-right: 0;
+            width: 100%;
+        }
+
+        .middle-box {
+            margin-top: 35px; /* Adjust as needed */
+            text-align: center;
+            position: relative; /* Make it relative to contain absolute elements */
+        }
+
+        iframe {
+            width: 100%;
+            height: 670px;
+            border: none; /* Remove border */
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(57,159,34);">
+        <a class="navbar-brand" href="{% if type == 'attendance' %}{% url 'attendance' %}
+                                      {% elif type == 'circular' %}{% url 'circular' %}
+                                      {% elif type == 'homework' %}{% url 'assignment' %}
+                                       {% elif type == 'examination' %}{% url 'examination' %}
+                                      {% elif type == 'fees' %}{% url 'fees' %}
+                                      {% elif type == 'payroll' %}{% url 'media' %}
+                                      {% endif %}">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            {% if type == 'payroll' %}
+                <span class="nav_text">MEDIA</span>
+            {% elif type == 'homework' %}
+                <span class="nav_text">ASSIGNMENT</span>
+            {% else %}
+                <span class="nav_text">{{ type|title|upper }}</span>
+            {% endif %}
+        </a>
+    </nav>
+    
+    {% if pdf_link %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <!-- Display the description -->
+                <h4 style="font-size: 18px; padding-top: 8px;">{{ description }}</h4>
+    
+                <!-- PDF Preview -->
+                <div class="middle-box">
+                    <iframe id="pdfViewer" src="" width="100%" height="670"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h4 style="font-size: 18px; padding-top: 8px;">{{ description |linebreaksbr }}</h4>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Font Awesome script -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    
+    <!-- JavaScript to render PDF -->
+    <script>
+        window.onload = function() {
+            var pdfViewer = document.getElementById('pdfViewer');
+            var pdfLink = "{{ pdf_link }}";
+            if (pdfLink) {
+                pdfViewer.src = "https://docs.google.com/gview?url=" + encodeURIComponent(pdfLink) + "&embedded=true";
+            }
+        };
+    </script>
+</body>
+</html>
+

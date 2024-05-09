@@ -26,6 +26,13 @@
             margin-left: 10px; /* Add left margin of 10px */
             font-size: 22px;
           }
+.container {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+}
 
         .middle-box {
             {% comment %} border: 1px solid #ccc; {% endcomment %}
@@ -98,13 +105,17 @@
     
                 <!-- PDF Preview -->
                 <div class="middle-box">
-                    <iframe src="{{ pdf_link }}"></iframe>
+                    {% comment %} <iframe src="{{ pdf_link }}"></iframe> {% endcomment %}
+
+                    <embed src="{{ pdf_link }}" type="application/pdf" width="100%" height="670px">
                 </div>
+
+                
                 <!-- Download button -->
                 {% comment %} <a id="downloadLink" href="#" class="download-button">Download PDF</a> {% endcomment %}
             </div>
         </div>
-    </div>
+    </div>zz
     {% else %}
     <div class="container">
         <div class="row">
@@ -115,7 +126,25 @@
     </div>
     {% endif %}
     
-    
+{% comment %}     
+    <object
+            data="{{ pdf_link }}"
+            type="application/pdf"
+            width="100%"
+            height="250vh"
+        >
+            <iframe
+                src="{{ pdf_link }}"
+                width="100%"
+                height="250vh"
+                style="border: none;"
+            >
+                <p>
+                    Your browser does not support PDFs.
+                    <a href="{{ pdf_link }}">Download the PDF</a>.
+                </p>
+            </iframe>
+        </object> {% endcomment %}
 
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 {% comment %} <script>
