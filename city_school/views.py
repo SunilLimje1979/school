@@ -26,7 +26,7 @@ def Login(request):
     elif request.method == "POST":
         # Get mobile number from POST data
         mobile_number = request.POST.get('mobileNumber')
-        print("Mobile Number:", mobile_number)
+        # print("Mobile Number:", mobile_number)
         
         
         
@@ -70,10 +70,10 @@ def Otp(request):
         return render(request, 'city_school/otp.html')
     else:
         mobile_number = request.session.get('mobile_number')
-        print("Mobile Number in OTP:", mobile_number)
+        # print("Mobile Number in OTP:", mobile_number)
         
         otp = request.POST.get('otp')
-        print("OTP:", otp)
+        # print("OTP:", otp)
         
         # Make a POST request to the loginmobile API
         api_url = "https://mispack.in/app/admin/public/loginmobile"
@@ -230,7 +230,7 @@ def store_admin_number(request):
             request.session['selected_admin_numbers'] = admin_numbers
             
             # Printing session data for verification
-            print("Session data:", request.session['selected_admin_numbers'])
+            # print("Session data:", request.session['selected_admin_numbers'])
 
             # Redirect to the profile page after successful selection
             return redirect('dashboard')  # Assuming 'profile' is the URL name for the profile page
@@ -987,7 +987,7 @@ def Pdf(request):
 # Suppress SSL warnings
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 def Photo(request, circular_id):
-    print("Received Circular ID:", circular_id)
+    # print("Received Circular ID:", circular_id)
     
     # API endpoint for fetching post details
     post_api_url = "https://mispack.in/app/admin/public/getpost"
@@ -1000,7 +1000,7 @@ def Photo(request, circular_id):
     # print(response.json())
     
     # Print the response content
-    print("Response Content:", response.content)
+    # print("Response Content:", response.content)
 
     # Extract image URLs and description from the response
     try:
@@ -1012,7 +1012,7 @@ def Photo(request, circular_id):
             for image_array in post.get('image_array', []):
                 image_url = f"https://www.mispack.in/app/application/main/{image_array['image']}"
                 image_urls.append(image_url)
-            print(image_urls)
+            # print(image_urls)
         else:
             # Handle the case when there's no response or no images found
             description = ''  # If no response or description is found, set to empty string

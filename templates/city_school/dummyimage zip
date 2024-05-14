@@ -1,3 +1,5 @@
+
+
 {% load i18n %}
 {% load static %}
 <!DOCTYPE html>
@@ -123,46 +125,48 @@
     </div>
 </div>
 <script>
-    // Function to handle download of each image separately
-    function downloadImage(imageUrl) {
-        // Proxy server URL
-        var proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-        
-        // Fetch the image through the proxy server
-        fetch(proxyUrl + imageUrl)
-            .then(response => response.blob())
-            .then(blob => {
-                // Create a temporary link element
-                var link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                
-                // Extract filename from URL
-                var filename = imageUrl.split('/').pop();
-                
-                // Set download attribute to force download
-                link.setAttribute('download', filename);
-                document.body.appendChild(link);
-                
-                // Trigger the click event to initiate download
-                link.click();
-                
-                // Remove the temporary link
-                document.body.removeChild(link);
-            })
-            .catch(error => {
-                console.error('Error fetching image:', error);
-            });
-    }
-
     // Function to handle download all images
     document.getElementById('download-button').addEventListener('click', function() {
+        // Create a zip object
+        var zip = new JSZip();
+        
         // Select all images in the carousel
         var images = document.querySelectorAll('.carousel-item img');
         
-        // Loop through each image and initiate download
-        images.forEach(function(image) {
+        // Array to store promises for fetching images
+        var promises = [];
+        
+        // Proxy server URL
+        var proxyUrl = 'https://cors-anywhere.herokuapp.com/'; // Example: CORS Anywhere
+        
+        // Loop through each image
+        images.forEach(function(image, index) {
+            // Get the image source URL
             var imageUrl = image.getAttribute('src');
-            downloadImage(imageUrl);
+            
+            // Proxy the image URL
+            var proxiedUrl = proxyUrl + imageUrl;
+            
+            // Split the URL to extract filename
+            var filename = imageUrl.split('/').pop();
+            
+            // Add fetch promise to array
+            promises.push(
+                fetch(proxiedUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    // Add the image to the zip file with a name
+                    zip.file(filename, blob);
+                })
+            );
+        });
+
+        // After all images are fetched, initiate the download
+        Promise.all(promises).then(() => {
+            zip.generateAsync({ type: "blob" }).then(function(content) {
+                // Use FileSaver.js to save the zip file
+                saveAs(content, "images.zip");
+            });
         });
     });
 </script>
@@ -180,5 +184,3 @@
 
 </body>
 </html>
-
-
