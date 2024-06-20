@@ -1,12 +1,14 @@
 {% load i18n %}
 {% load static %}
-
+{% load pwa %} 
+{% comment %} {% progressive_web_app_meta %} {% endcomment %}
 
 <!doctype html>
 <html lang="en">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
+    <link rel="manifest" href="{% static "assets/manifest.json" %}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap CSS -->

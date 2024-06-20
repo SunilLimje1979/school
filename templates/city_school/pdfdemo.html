@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download PDF</title>
+
+</head>
+<body>
+    <h1>PDF Download Page</h1>
+    <p>The PDF will automatically download when the page is loaded.</p>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        alert("Your download will start now.");
+
+        const pdfUrl = "https://www.mispack.in/app/application/main/singleimage/1718361033.pdf";
+        const link = document.createElement("a");
+        link.href = pdfUrl;
+        link.download = "assignment.pdf"; // specify the filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+</script>
+</html>

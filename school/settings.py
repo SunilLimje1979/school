@@ -19,6 +19,38 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+# PWA_APP_NAME = "school"
+# PWA_APP_DESCRIPTION = "City School Web App"
+# PWA_APP_THEME_COLOR = "#34eb4c"
+# PWA_APP_BACKGROUND_COLOR = "#f2f5f3"
+# PWA_APP_DISPLAY = 'standalone'
+# PWA_APP_SCOPE = '/'
+# PWA_APP_ORIENTATION = 'portrait'
+# PWA_APP_START_URL = '/school/login/'
+# PWA_APP_ICONS = [
+#     {
+#         'src': '/school/static/assets/img/icon.png',
+#         'sizes': '512x512'
+#     }
+# ]
+# PWA_APP_ICONS_APPLE = [
+#     {
+#         'src': '/school/static/assets/img/icon.png',
+#         'sizes': '512x512'
+#     }
+# ]
+# PWA_APP_SPLASH_SCREEN = [
+#     {
+#         'src': 'school/static/assets/img/icon.png',
+#         'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)'
+#     }
+# ]
+
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/assets/js', 'serviceworker.js')
+
+
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -28,7 +60,7 @@ SECRET_KEY = 'django-insecure-#arb83#cv53f&n9=u4=1o(mclqp-sbp=mxpbbztg6klm59_6&$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*','192.168.1.20','192.168.1.9']
+ALLOWED_HOSTS = ['*','192.168.1.20','192.168.127.44']
 
 
 # Application definition
@@ -41,6 +73,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'city_school',
+    'pwa',
 ]
 
 MIDDLEWARE = [
@@ -75,7 +108,7 @@ WSGI_APPLICATION = 'school.wsgi.application'
 
 STATIC_URL = "/school/static/"
 STATICFILES_DIRS = [
-    BASE_DIR / "school/static"
+    BASE_DIR / "static"
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 

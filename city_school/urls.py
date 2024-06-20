@@ -40,4 +40,6 @@ urlpatterns = [
     
     path('store_admin_number/', views.store_admin_number, name='store_admin_number'),
     
+    path('pdfdemo/', views.pdfdemo, name='pdfdemo'),
+    
 ]
